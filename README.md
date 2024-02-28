@@ -16,7 +16,13 @@ To check yarn version installed or not"yarn --version"
 -----------------------------------------
 Step 3 - install node module in project
 -----------------------------------------
-add node_module to project via this command "yarn install"
+add node_module to project via this command "yarn install".This is uptime checker so you need run/re-run the server every time . So we need nodemon for solve this issue.Add nodeman in dev dependencies by run this command
+yarn add nodemon --dev
+
+Why i prefer use nodemon dev dependencies rather then in globally ?
+Ans : Global installations might have some drawbacks, such as potential version conflicts between projects. 
+ 
+
 
 
 
