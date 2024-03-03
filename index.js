@@ -7,10 +7,14 @@
 const http = require('http');
 const { hendleReqRes } = require('./helpers/handleReqRes');
 const environment = require('./helpers/environment');
+const data = require('./lib/data');
 
 // app object - module scaffolding
 const app = {};
-
+// data create in lib/data.js folder
+data.createData('test','newFile',{'name':'Akbar','language':'bangla'},(err)=>{
+    console.log(err);
+});
 app.createServer = () =>{
     const server = http.createServer(app.handleReqRes);
     server.listen(environment.port,()=>{
