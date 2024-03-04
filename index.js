@@ -12,8 +12,12 @@ const data = require('./lib/data');
 // app object - module scaffolding
 const app = {};
 // data create in lib/data.js folder
-data.createData('test','newFile',{'name':'Akbar','language':'bangla'},(err)=>{
-    console.log(err);
+// data.createData('test','newFile',{'name':'Akbar','language':'bangla'},(err)=>{
+//     console.log(err);
+// });
+// data read in lib/data.js folder
+data.readData('test','newFile',(err,data)=>{
+    console.log(err,data);
 });
 app.createServer = () =>{
     const server = http.createServer(app.handleReqRes);
