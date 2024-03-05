@@ -1,6 +1,7 @@
 // Dependencies
 const data = require('../../lib/data');
 const { hash } = require('../../helpers/utilites');
+const { parseJson } = require('../../helpers/utilites');
 
 // Module scaffolding
 const handler = {};
@@ -64,7 +65,25 @@ handler._users.post = (requestProperties, callback) => {
 
 // Get user
 handler._users.get = (requestProperties, callback) => {
-    callback(200);
+    // validation
+    const phoneNumber = typeof (requestProperties.queryStringObject.phoneNumber) === 'string' && requestProperties.queryStringObject.phoneNumber.trim().length === 11 ? requestProperties.queryStringObject.phoneNumber : false;
+    if(!phoneNumber)
+    {
+     callback(402,{
+        error : "Please enter 11 digit valid(ex: 016xxxxxxxx) phone number"
+     })
+    }
+    data.readData('users',phoneNumber,(err,data)=>{
+        let userData = {...parseJson(data)};
+        if(userData)
+        {
+            delete userData.password;
+            callback(200,userData);
+        }
+    });
+
+
+
 };
 
 module.exports = handler;
