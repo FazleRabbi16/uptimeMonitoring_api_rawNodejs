@@ -140,6 +140,34 @@ handler._users.put =(requestProperties, callback) =>{
     }
 }
 
+// Delete user data
+handler._users.delete=(requestProperties,callback) =>{
+    const phoneNumber = typeof (requestProperties.queryStringObject.phoneNumber) === 'string' && requestProperties.queryStringObject.phoneNumber.trim().length === 11 ? requestProperties.queryStringObject.phoneNumber : false;
+    if(phoneNumber){
+     //prepare updat data
+     data.readData('users',phoneNumber,(err,uData)=>{
+        let userData = parseJson(uData);
+        if(!err && userData)
+        {
+        // update user data 
+        data.deleteData('users',phoneNumber,(err1)=>{
+            if(!err1)
+            {
+                callback(505,{
+                    success : 'User delete successfully'
+                });   
+            }else{
+                callback(505,{
+                    error : 'Something happen or provide in-correct data'
+                });
+            }
+        });
+        }
+    });
+    }
+
+}
+
 
 
 module.exports = handler;
