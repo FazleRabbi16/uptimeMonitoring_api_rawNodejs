@@ -121,19 +121,19 @@ handler._tokens.put =(requestProperties, callback) =>{
 
 // Delete user data
 handler._tokens.delete=(requestProperties,callback) =>{
-    const phoneNumber = typeof (requestProperties.queryStringObject.phoneNumber) === 'string' && requestProperties.queryStringObject.phoneNumber.trim().length === 11 ? requestProperties.queryStringObject.phoneNumber : false;
-    if(phoneNumber){
+    const tokenId = typeof (requestProperties.queryStringObject.id) === 'string' ? requestProperties.queryStringObject.id : false;
+    if(tokenId){
      //prepare updat data
-     data.readData('users',phoneNumber,(err,uData)=>{
+     data.readData('tokens',tokenId,(err,uData)=>{
         let userData = parseJson(uData);
         if(!err && userData)
         {
         // update user data 
-        data.deleteData('users',phoneNumber,(err1)=>{
+        data.deleteData('tokens',tokenId,(err1)=>{
             if(!err1)
             {
                 callback(505,{
-                    success : 'User delete successfully'
+                    success : 'Token delete successfully'
                 });   
             }else{
                 callback(505,{
@@ -146,7 +146,4 @@ handler._tokens.delete=(requestProperties,callback) =>{
     }
 
 }
-
-
-
 module.exports = handler;
