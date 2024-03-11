@@ -64,19 +64,19 @@ handler._tokens.post = (requestProperties, callback) => {
 // Read a user
 handler._tokens.get = (requestProperties, callback) => {
     // validation
-    const phoneNumber = typeof (requestProperties.queryStringObject.phoneNumber) === 'string' && requestProperties.queryStringObject.phoneNumber.trim().length === 11 ? requestProperties.queryStringObject.phoneNumber : false;
-    if(!phoneNumber)
+    const tokenId = typeof (requestProperties.queryStringObject.id) === 'string' ? requestProperties.queryStringObject.id : false;
+
+    if(!tokenId)
     {
      callback(402,{
-        error : "Please enter 11 digit valid(ex: 016xxxxxxxx) phone number"
+        error : "Please enter valid token id"
      })
     }
-    data.readData('users',phoneNumber,(err,data)=>{
-        let userData = {...parseJson(data)};
-        if(userData)
+    data.readData('tokens',tokenId,(err,data)=>{
+        let tokenData = {...parseJson(data)};
+        if(tokenData)
         {
-            delete userData.password;
-            callback(200,userData);
+            callback(200,tokenData);
         }
     });
 
