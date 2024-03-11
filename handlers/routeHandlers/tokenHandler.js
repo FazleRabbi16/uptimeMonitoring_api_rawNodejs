@@ -87,52 +87,34 @@ handler._tokens.get = (requestProperties, callback) => {
 // PUT/Update a user
 handler._tokens.put =(requestProperties, callback) =>{
     //validation
-    const firstName = typeof (requestProperties.body.firstName) === 'string' && requestProperties.body.firstName.trim().length > 0 ? requestProperties.body.firstName : false;
-    const lastName = typeof (requestProperties.body.lastName) === 'string' && requestProperties.body.lastName.trim().length > 0 ? requestProperties.body.lastName : false;
-    const phoneNumber = typeof (requestProperties.body.phoneNumber) === 'string' && requestProperties.body.phoneNumber.trim().length === 11 ? requestProperties.body.phoneNumber : false;
-    const userPassword = typeof (requestProperties.body.password) === 'string' && requestProperties.body.password.length > 0 ? requestProperties.body.password : false;
+    const tokenId = typeof (requestProperties.body.id) === 'string' && requestProperties.body.id.trim().length === 20 ? requestProperties.body.id : false;
+    const extend = typeof (requestProperties.body.extend) === 'boolean' && requestProperties.body.extend === true ? true : false;
     //get user by phone number
-    if(phoneNumber){
-        if(firstName || lastName || userPassword){
-            //prepare updat data
-            data.readData('users',phoneNumber,(err,uData)=>{
-                let userData = parseJson(uData);
-                if(!err && userData)
-                {
-                    if(firstName)
-                    {
-                     userData.firstName=firstName;
-                    }
-                    if(lastName)
-                    {
-                     userData.lastName = lastName;
-                    }
-                    if (userPassword) {
-                      userData.userPassword = hash(userPassword);
-                    }
-                // update user data 
-                data.updateData('users',phoneNumber,userData,(err1)=>{
-                    if(!err1)
-                    {
-                        callback(505,{
-                            success : 'User updated successfully'
-                        });   
-                    }else{
-                        callback(505,{
-                            error : 'Something happen or provide in-correct data'
-                        });
-                    }
-                });
+    if(tokenId){
+        data.readData('tokens',tokenId,(err,tokenData)=>{
+         let tokenObj = parseJson(tokenData);   
+         if(tokenObj.expires > Date.now()){
+            tokenObj.expires = Date.now()+60*60*1000;
+            data.updateData('tokens',tokenId,tokenObj,(err1)=>{
+                if(!err1){
+                    callback(200,{
+                        success : 'Token expire time updated'
+                    });
+                }else{
+                    callback(505,{
+                        error : 'server side error'
+                    });
                 }
             });
-        }else{
-            callback(505,{
-                error : 'May find some problem with your request'
+         }else{
+            callback(405,{
+                error : 'Token already expire'
             });
-        }
+         }
+        });
     }else{
         callback(505,{
-            error : 'user not found with this phone number'
+            error : 'server side error'
         });
     }
 }
