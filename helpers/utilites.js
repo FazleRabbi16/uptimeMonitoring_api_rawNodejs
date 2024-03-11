@@ -25,5 +25,19 @@ utilities.hash=(str)=>{
     return false;
    }
 }
+utilities.createRandomString=(strLength)=>{
+   let length = strLength;
+   length = typeof(length)==='number' && length > 0 ? length:false;
+  if(length){
+      let result = '';
+      const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      for (let i = 0; i <= length; i++) {
+         result += characters.charAt(Math.floor(Math.random() * length));
+    }
+   return result;
+  }else{
+   return false;
+  }
+}
 //export environment
 module.exports = utilities; 
