@@ -144,6 +144,18 @@ handler._tokens.delete=(requestProperties,callback) =>{
         }
     });
     }
-
+}
+handler._tokens.verify = (id,phoneNumber,callback)=>{
+  data.readData('tokens',id,(err,tokenData)=>{
+     if(!err && tokenData){
+       if(parseJson(tokenData).phoneNumber === phoneNumber && parseJson(tokenData).expires > Date.now()){
+        callback(true);
+       }else{
+        callback(false);
+       }
+     }else{
+        callback(false);
+     }
+  });
 }
 module.exports = handler;

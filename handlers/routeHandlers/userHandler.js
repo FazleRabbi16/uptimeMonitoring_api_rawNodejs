@@ -2,6 +2,7 @@
 const data = require('../../lib/data');
 const { hash } = require('../../helpers/utilites');
 const { parseJson } = require('../../helpers/utilites');
+const tokenHandler = require('./tokenHandler');
 
 // Module scaffolding
 const handler = {};
@@ -74,17 +75,26 @@ handler._users.get = (requestProperties, callback) => {
         error : "Please enter 11 digit valid(ex: 016xxxxxxxx) phone number"
      })
     }
-    data.readData('users',phoneNumber,(err,data)=>{
-        let userData = {...parseJson(data)};
-        if(userData)
-        {
-            delete userData.password;
-            callback(200,userData);
-        }
-    });
-
-
-
+    if(phoneNumber){
+        let token = typeof(requestProperties.metaDataObject.token) === 'string' ? requestProperties.metaDataObject.token:false;
+        tokenHandler._tokens.verify(token,phoneNumber,(tokenId)=>{
+          if(tokenId){
+            data.readData('users',phoneNumber,(err,data)=>{
+                let userData = parseJson(data);
+                if(userData)
+                {
+                    delete userData.userPassword;
+                    delete userData.password;
+                    callback(200,userData);
+                }
+            });
+          }else{
+            callback(404,{
+                error:"Un-authincated",
+            });
+          }
+        });
+    }
 };
 
 // PUT/Update a user
@@ -97,7 +107,10 @@ handler._users.put =(requestProperties, callback) =>{
     //get user by phone number
     if(phoneNumber){
         if(firstName || lastName || userPassword){
-            //prepare updat data
+            let token = typeof(requestProperties.metaDataObject.token) === 'string' ? requestProperties.metaDataObject.token:false;
+            tokenHandler._tokens.verify(token,phoneNumber,(tokenId)=>{
+              if(tokenId){
+                 //prepare updat data
             data.readData('users',phoneNumber,(err,uData)=>{
                 let userData = parseJson(uData);
                 if(!err && userData)
@@ -127,6 +140,12 @@ handler._users.put =(requestProperties, callback) =>{
                     }
                 });
                 }
+              });
+              }else{
+                callback(404,{
+                    error:"Un-authincated",
+                });
+              }
             });
         }else{
             callback(505,{
@@ -144,26 +163,36 @@ handler._users.put =(requestProperties, callback) =>{
 handler._users.delete=(requestProperties,callback) =>{
     const phoneNumber = typeof (requestProperties.queryStringObject.phoneNumber) === 'string' && requestProperties.queryStringObject.phoneNumber.trim().length === 11 ? requestProperties.queryStringObject.phoneNumber : false;
     if(phoneNumber){
-     //prepare updat data
+    // veirfy user
+    let token = typeof(requestProperties.metaDataObject.token) === 'string' ? requestProperties.metaDataObject.token:false;
+        tokenHandler._tokens.verify(token,phoneNumber,(tokenId)=>{
+          if(tokenId){
+             //prepare delete data
      data.readData('users',phoneNumber,(err,uData)=>{
         let userData = parseJson(uData);
         if(!err && userData)
         {
-        // update user data 
-        data.deleteData('users',phoneNumber,(err1)=>{
+         // update user data 
+         data.deleteData('users',phoneNumber,(err1)=>{
             if(!err1)
-            {
-                callback(505,{
-                    success : 'User delete successfully'
-                });   
-            }else{
-                callback(505,{
-                    error : 'Something happen or provide in-correct data'
+                {
+                    callback(505,{
+                        success : 'User delete successfully'
+                    });   
+                }else{
+                    callback(505,{
+                        error : 'Something happen or provide in-correct data'
+                    });
+                }
                 });
-            }
-        });
-        }
-    });
+                }
+            });
+          }else{
+            callback(404,{
+                error:"Un-authincated",
+            });
+          }
+        });    
     }
 
 }
